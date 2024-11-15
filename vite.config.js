@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import vue from '../stores/plugin-vue';
+import vue from '@vitejs/plugin-vue';
 import path from 'path'
 
 let mypath = `/${path.basename(__dirname)}/dist/`

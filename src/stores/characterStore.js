@@ -4,12 +4,8 @@ import { defineStore } from "pinia";
 export const useCharacterStore = defineStore("character", {
   state: () => ({
     selectedCharacter: null,
-    characterList: [],
   }),
   actions: {
-    setCharacterList(list) {
-      this.characterList = list;
-    },
     selectCharacter(character) {
       this.selectedCharacter = character;
       console.log(`Personnage sélectionné : ${this.selectedCharacter}`);
@@ -17,5 +13,8 @@ export const useCharacterStore = defineStore("character", {
     isSelected(character) {
       return this.selectedCharacter === character;
     },
+  },
+  getters: {
+    hasSelectedCharacter: (state) => !!state.selectedCharacter,
   },
 });

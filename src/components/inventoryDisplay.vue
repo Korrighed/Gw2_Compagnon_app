@@ -9,6 +9,7 @@ const { selectedCharacter } = storeToRefs(characterStore);
 const inventoryList = ref([]);
 const accountKeyInvent = "AB80A66C-EB05-F647-8E04-917AE8028FDE2DB0E55F-FDE0-4C57-8602-F8637CE9C5A4";
 
+console.log("inventory of ", characterStore)
 // Fonction pour récupérer l'inventaire du personnage sélectionné
 async function fetchInventory() {
   if (!selectedCharacter.value) {
@@ -43,7 +44,7 @@ onMounted(() => {
     fetchInventory();
   }
 });
-</script>
+</script> 
 
 <template>
 

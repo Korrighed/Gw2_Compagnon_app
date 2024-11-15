@@ -5,7 +5,7 @@
       </div>
     </div>
     <div class="row">
-      <div>
+      <div class="border-3">
         <inventoryDisplay.vue />
       </div>
     </div>
