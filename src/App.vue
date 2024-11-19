@@ -6,15 +6,15 @@
     </div>
     <div class="row">
       <div class="border-3">
-        <inventoryDisplay.vue />
+        <inventoryDisplay />
       </div>
     </div>
   </template>
   
   <script setup>
-    import charactersDisplay from './components/charactersDisplay.vue';
+    import charactersDisplay from './components/charactersDisplay.vue'; 
     import inventoryDisplay from  './components/inventoryDisplay.vue';
   </script>
   
-  <style>
+<style>
 </style>

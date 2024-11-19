@@ -1,15 +1,18 @@
 <script setup>
 import { storeToRefs } from "pinia";
-import { useCharacterStore } from "../stores/characterStore.js";
-import { ref, onMounted, watch } from "vue";
+import { ref, watch } from "vue";
 import axios from "axios";
+import { useCharacterStore } from "../stores/characterStore.js";
 
 const characterStore = useCharacterStore();
-const { selectedCharacter } = storeToRefs(characterStore);
-const inventoryList = ref([]);
-const accountKeyInvent = "AB80A66C-EB05-F647-8E04-917AE8028FDE2DB0E55F-FDE0-4C57-8602-F8637CE9C5A4";
+const { selectedCharacter } = storeToRefs(characterStore); 
 
-console.log("inventory of ", characterStore)
+// Constantes et variables réactives
+const accountKeyInvent = "AB80A66C-EB05-F647-8E04-917AE8028FDE2DB0E55F-FDE0-4C57-8602-F8637CE9C5A4";
+const inventoryList = ref([]); // Liste brute de l'inventaire
+const itemIdList = ref([]); // Liste des IDs des items
+const itemsDetails = ref([]); // Détails des items pour l'affichage
+
 // Fonction pour récupérer l'inventaire du personnage sélectionné
 async function fetchInventory() {
   if (!selectedCharacter.value) {
@@ -17,6 +20,7 @@ async function fetchInventory() {
     return;
   }
 
+  // Construction de l'URL pour l'appel API
   const gw2ApiInventoryUrl = `https://api.guildwars2.com/v2/characters/${encodeURIComponent(selectedCharacter.value)}/inventory`;
 
   try {
@@ -25,35 +29,82 @@ async function fetchInventory() {
         access_token: accountKeyInvent,
       },
     });
-    inventoryList.value = response.data;
+
+    inventoryList.value = response.data; // Mettre à jour l'inventaire brut
     console.log("Inventaire récupéré :", inventoryList.value);
+
+    // Extraire les IDs et récupérer les détails des items
+    storeItemIds(inventoryList.value);
+    await fetchItemDetails(); // Récupérer les détails
   } catch (error) {
     console.error("Erreur lors de la récupération de l'inventaire :", error);
   }
 }
 
-// Surveiller le changement du personnage sélectionné et récupérer l'inventaire
-watch(selectedCharacter, (newValue) => {
-  if (newValue) {
-    fetchInventory();
-  }
-});
+// Fonction pour extraire les IDs des items
+function storeItemIds(data) {
+  if (!data || !data.bags) return;
 
-onMounted(() => {
-  if (selectedCharacter.value) {
-    fetchInventory();
+  const ids = [];
+  data.bags.forEach((bag) => {
+    bag.inventory?.forEach((item) => {
+      if (item?.id) {
+        ids.push(item.id);
+      }
+    });
+  });
+
+  itemIdList.value = ids; 
+  console.log("Liste des IDs :", itemIdList.value);
+}
+
+async function fetchItemDetails() {
+  const chunkSize = 200; // Taille maximale autorisée par l'API
+  const apiUrl = "https://api.guildwars2.com/v2/items";
+
+  for (let i = 0; i < itemIdList.value.length; i += chunkSize) {
+    const idsChunk = itemIdList.value.slice(i, i + chunkSize).join(",");
+    try {
+      const response = await axios.get(apiUrl, {
+        params: {
+          ids: idsChunk,
+        },
+      });
+
+      // Ajouter les détails des items progressivement
+      itemsDetails.value.push(...response.data);
+      console.log("Détails des items reçus :", response.data);
+    } catch (error) {
+      console.error(`Erreur lors de la récupération des détails pour les IDs ${idsChunk}:`, error);
+    }
+  }
+}
+
+// Surveillance des changements de personnage via `watch`
+watch(selectedCharacter, async (newValue, oldValue) => {
+  if (newValue) {
+    console.log(`Personnage sélectionné : ${newValue}`);
+    itemsDetails.value = [];
+    itemIdList.value = [];
+    inventoryList.value = [];
+    await fetchInventory(); // Récupérer l'inventaire du nouveau personnage
+  } else {
+    console.log("Aucun personnage sélectionné.");
+    itemsDetails.value = [];
+    inventoryList.value = [];
   }
 });
-</script> 
+</script>
 
 <template>
-
+  <div>
+    <h3>Inventaire des Items</h3>
+    <ul>
+      <li v-for="item in itemsDetails" :key="item.id">
+        <img :src="item.icon" alt="Icone de l'item" style="width: 24px; height: 24px;" />
+        <strong>{{ item.name }}</strong>: {{ item.description || "None" }}
+      </li>
+    </ul>
+  </div>
 </template>
 
-<style>
-/* Styles optionnels */
-.nav-link.active {
-  background-color: #007bff;
-  color: white;
-}
-</style>

@@ -10,7 +10,7 @@ const { selectedCharacter } = storeToRefs(characterStore);
 
 
 const accountKey =
-    "2510AB82-9F10-0148-9B76-B52311462A8800823087-0CF9-4550-B881-43B3665ACAE3";
+"2510AB82-9F10-0148-9B76-B52311462A8800823087-0CF9-4550-B881-43B3665ACAE3";
 const characterList = ref([]);
 const gw2ApiUrl = "https://api.guildwars2.com/v2/characters";
 
