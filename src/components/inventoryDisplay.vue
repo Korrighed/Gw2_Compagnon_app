@@ -4,6 +4,7 @@ import { ref, watch } from "vue";
 import axios from "axios";
 import { useCharacterStore } from "../stores/characterStore.js";
 
+
 const characterStore = useCharacterStore();
 const { selectedCharacter } = storeToRefs(characterStore); 
 
@@ -12,6 +13,7 @@ const accountKeyInvent = "AB80A66C-EB05-F647-8E04-917AE8028FDE2DB0E55F-FDE0-4C57
 const inventoryList = ref([]); // Liste brute de l'inventaire
 const itemIdList = ref([]); // Liste des IDs des items
 const itemsDetails = ref([]); // Détails des items pour l'affichage
+
 
 // Fonction pour récupérer l'inventaire du personnage sélectionné
 async function fetchInventory() {
@@ -39,6 +41,12 @@ async function fetchInventory() {
   } catch (error) {
     console.error("Erreur lors de la récupération de l'inventaire :", error);
   }
+}
+function  nameFormat(itemName) {
+  if (itemName.length > 19) {
+    return `${itemName.slice(0, 19)}...`;
+  }
+  return itemName;
 }
 
 // Fonction pour extraire les IDs des items
@@ -70,7 +78,6 @@ async function fetchItemDetails() {
           ids: idsChunk,
         },
       });
-
       // Ajouter les détails des items progressivement
       itemsDetails.value.push(...response.data);
       console.log("Détails des items reçus :", response.data);
@@ -79,6 +86,7 @@ async function fetchItemDetails() {
     }
   }
 }
+
 
 // Surveillance des changements de personnage via `watch`
 watch(selectedCharacter, async (newValue, oldValue) => {
@@ -94,17 +102,48 @@ watch(selectedCharacter, async (newValue, oldValue) => {
     inventoryList.value = [];
   }
 });
+
+
 </script>
 
 <template>
-  <div>
-    <h3>Inventaire des Items</h3>
-    <ul>
-      <li v-for="item in itemsDetails" :key="item.id">
-        <img :src="item.icon" alt="Icone de l'item" style="width: 24px; height: 24px;" />
-        <strong>{{ item.name }}</strong>: {{ item.description || "None" }}
-      </li>
-    </ul>
+  <div class="container text-center">
+    <div class="row row-cols-auto">
+      <div class="col" v-for="item in itemsDetails" :key="item.id">
+        <div class="card">
+          <img :src="item.icon" class="img-fluid rounded-start" alt="Icone de l'item" />
+          <div class="card-body">
+            <h5 class="card-title">{{ nameFormat(item.name) }}</h5>
+            <p class="card-text">{{ item.type || null }}</p>
+            
+            <!-- Tableau des attributs si disponible -->
+            <table v-if="item.details?.infix_upgrade?.attributes?.length" class="table table-striped mt-2">
+              <thead>
+                <tr>
+                  <th>Attribut</th>
+                  <th>Modificateur</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="attribute in item.details.infix_upgrade.attributes" :key="attribute.attribute">
+                  <td>{{ attribute.attribute }}</td>
+                  <td>{{ attribute.modifier }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
+
+
+<style>
+.card-img-top {
+  width: 100%; 
+  height: auto; 
+  max-height: 50px;
+}
+</style>

@@ -5,9 +5,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="border-3">
         <inventoryDisplay />
-      </div>
     </div>
   </template>
   
