@@ -43,8 +43,8 @@ async function fetchInventory() {
   }
 }
 function  nameFormat(itemName) {
-  if (itemName.length > 19) {
-    return `${itemName.slice(0, 19)}...`;
+  if (itemName.length > 25) {
+    return `${itemName.slice(0, 25)}...`;
   }
   return itemName;
 }
@@ -111,17 +111,18 @@ watch(selectedCharacter, async (newValue, oldValue) => {
     <div class="row row-cols-auto">
       <div class="col" v-for="item in itemsDetails" :key="item.id">
         <div class="card">
-          <img :src="item.icon" class="img-fluid rounded-start" alt="Icone de l'item" />
+          <img :src="item.icon" class="img-thumbnail" alt="Icone de l'item" />
           <div class="card-body">
-            <h5 class="card-title">{{ nameFormat(item.name) }}</h5>
-            <p class="card-text">{{ item.type || null }}</p>
-            
+            <p class="card-title"><strong>{{ nameFormat(item.name) }}</strong></p>
+            <p v-if="item.details?.type && item.details.type !=='Default'" class="card-text">
+              {{ item.details.type}}
+            </p>
             <!-- Tableau des attributs si disponible -->
-            <table v-if="item.details?.infix_upgrade?.attributes?.length" class="table table-striped mt-2">
+            <table v-if="item.details?.infix_upgrade?.attributes?.length" class="table table-striped">
               <thead>
                 <tr>
-                  <th>Attribut</th>
-                  <th>Modificateur</th>
+                  <th>Stats</th>
+                  <th>Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,6 +132,7 @@ watch(selectedCharacter, async (newValue, oldValue) => {
                 </tr>
               </tbody>
             </table>
+            <p v-else-if="item.details?.description">{{ item.details.description }}</p>
           </div>
         </div>
       </div>
@@ -141,9 +143,9 @@ watch(selectedCharacter, async (newValue, oldValue) => {
 
 
 <style>
-.card-img-top {
-  width: 100%; 
-  height: auto; 
-  max-height: 50px;
+.img-thumbnail { 
+  width: auto;
+  max-width: 100%;
+  height: 90px;
 }
 </style>
