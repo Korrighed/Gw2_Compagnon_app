@@ -144,8 +144,9 @@ watch(selectedCharacter, async (newValue, oldValue) => {
 
 <style>
 .img-thumbnail { 
+  object-fit: contain;
   width: auto;
   max-width: 100%;
-  height: 90px;
+  height: 10px;
 }
 </style>
