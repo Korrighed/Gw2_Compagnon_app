@@ -107,37 +107,33 @@ watch(selectedCharacter, async (newValue, oldValue) => {
 </script>
 
 <template>
-  <div class="container text-center">
-    <div class="row row-cols-auto">
-      <div class="col" v-for="item in itemsDetails" :key="item.id">
+  <section class="container pt-2 text-center">
+    <div class="row justify-content-center">
+      <div class="col-1  g-1" v-for="item in itemsDetails" :key="item.id">
         <div class="card">
           <img :src="item.icon" class="img-thumbnail" alt="Icone de l'item" />
-          <div class="card-body">
-            <p class="card-title"><strong>{{ nameFormat(item.name) }}</strong></p>
-            <p v-if="item.details?.type && item.details.type !=='Default'" class="card-text">
+          <div class="card-body p-0">
+            <p class="card-title fw-bold">{{ item.name }}</p>
+            <p v-if="item.details?.type && item.details.type !=='Default' && item.details.type !=='Generic'" class="card-text">
               {{ item.details.type}}
             </p>
-            <!-- Tableau des attributs si disponible -->
-            <table v-if="item.details?.infix_upgrade?.attributes?.length" class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Stats</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="attribute in item.details.infix_upgrade.attributes" :key="attribute.attribute">
-                  <td>{{ attribute.attribute }}</td>
-                  <td>{{ attribute.modifier }}</td>
-                </tr>
-              </tbody>
-            </table>
-            <p v-else-if="item.details?.description">{{ item.details.description }}</p>
-          </div>
+              <!-- Tableau des attributs si disponible -->
+            <div class="table-responsive text-start">
+              <table v-if="item.details?.infix_upgrade?.attributes?.length" class="table table-sm" >
+                <tbody>
+                  <tr v-for="(attribute, index) in item.details.infix_upgrade.attributes.slice(0, 5)" :key="index" >
+                    <td>{{ attribute.attribute }}</td>
+                    <td>{{ attribute.modifier }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p v-if="item.details?.description">{{ item.details.description }}</p>
         </div>
       </div>
+      </div>
     </div>
-  </div>
+  </section>
 </template>
 
 
@@ -146,7 +142,9 @@ watch(selectedCharacter, async (newValue, oldValue) => {
 .img-thumbnail { 
   object-fit: contain;
   width: auto;
-  max-width: 100%;
-  height: 10px;
+  max-height: 10vh;
+}
+.card {
+  max-height: 40vh;
 }
 </style>
