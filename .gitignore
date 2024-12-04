@@ -1,1 +1,23 @@
+# Editor directories and files
+.idea
 .vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Npm
+package-lock.json
+node_modules
+
+# Build folder
+dist/*
+
+# Local env files
+.env
+.env.*
+
+# Gitkeep empty folders
+!**/.gitkeep
