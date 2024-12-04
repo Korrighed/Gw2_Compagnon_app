@@ -8,9 +8,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "build-w": "vite build --watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
