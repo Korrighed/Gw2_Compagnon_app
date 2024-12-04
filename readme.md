@@ -7,6 +7,7 @@ Guild Wars 2 dev and Arena graciously offers a API system that allows reading on
 # Usage 
 In order to properly use this app, you will need an api key relative to your account from Arenanet. 
 Please refer to the wiki on how to generate said key: 
++ https://korrighed.github.io/Gw2_Compagnon_app/
 + https://wiki.guildwars2.com/wiki/API:API_key
 + https://account.arena.net/login?redirect_uri=%2Fapplications
 
