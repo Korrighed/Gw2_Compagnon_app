@@ -1,18 +1,18 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import path from 'path'
 
-let mypath = `/${path.basename(__dirname)}/dist/`
+export default ({ mode }) => {
+  const env = loadEnv(mode, process.cwd());
 
-export default defineConfig({
-    // base : `/Gw2_Compagnon_app/`,
-    base: `/${path.basename(__dirname)}/dist/`, 
+  return defineConfig({
+    base: env.VITE_BASE ||'/',
     plugins: [vue()],
-    build :{
-        watch : {
-            exclude : [
-                'dist/**',
-            ]
-        }
+    build: {
+      watch: {
+        exclude: [
+          'dist/**',
+        ]
+      }
     }
-});
+  });
+};
