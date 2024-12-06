@@ -106,15 +106,15 @@ watch(selectedCharacter, async (newValue, oldValue) => {
   <section class="container pt-2 text-center mx-3">
     <div class="row justify-content-center">
       <div class="col-1  g-1" v-for="item in itemsDetails" :key="item.id">
-        <div class="card ">
-          <img :src="item.icon" class="img-thumbnail" alt="Icone de l'item" />
+        <div class="card">
+          <img :src="item.icon" class="card-img" alt="Icone de l'item" />
           <div class="card-body p-0">
-            <p class="card-title fw-bold">{{ item.name }}</p>
-            <p v-if="item.details?.type && item.details.type !=='Default' && item.details.type !=='Generic'" class="card-text">
+            <p class="card-title fs-6 mb-0 fw-semibold">{{ item.name }}</p>
+            <p v-if="item.details?.type && item.details.type !=='Default' && item.details.type !=='Generic'" class="card-text mb-0 text-center">
               {{ item.details.type}}
             </p>
               <!-- Tableau des attributs si disponible -->
-            <div class="table-responsive text-start">
+            <div class="table-responsive">
               <table v-if="item.details?.infix_upgrade?.attributes?.length" class="table table-sm" >
                 <tbody>
                   <tr v-for="(attribute, index) in item.details.infix_upgrade.attributes.slice(0, 6)" :key="index" >
@@ -135,10 +135,10 @@ watch(selectedCharacter, async (newValue, oldValue) => {
 
 
 <style>
-.img-thumbnail { 
+.card-img { 
   object-fit: contain;
   width: auto;
-  max-height: 10vh;
+  max-height: 5vh;
 }
 .card {
   max-height: 40vh;
