@@ -1,14 +1,17 @@
 // src/stores/characterStore.js
 import { defineStore } from "pinia";
 
-export const useApiKey = defineStore("apiKey", {
+export const useApiKey = defineStore("apiKeyStore", {
   state: () => ({
-    apiKey: null,
+    apiKey: "",
   }),
   actions: {
     selectApiKey(apiKey) {
-      this.apiKey = apiKey;
-      console.log(`Clé API enregistrée : ${this.apiKey}`);
+      if (!apiKey) {
+        console.error("Clé API invalide ou absente !");
+        return;
+      }
+      this.apiKey = apiKey.trim().replace(/\s+/g, "");
     },
   },
 });

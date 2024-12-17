@@ -10,7 +10,6 @@ const characterStore = useCharacterStore();
 const { selectedCharacter } = storeToRefs(characterStore); 
 
 // Constantes et variables réactives
-const accountKeyInvent = "AB80A66C-EB05-F647-8E04-917AE8028FDE2DB0E55F-FDE0-4C57-8602-F8637CE9C5A4";
 const inventoryList = ref([]); // Liste brute de l'inventaire
 const itemIdList = ref([]); // Liste des IDs des items
 const itemsDetails = ref([]); // Détails des items pour l'affichage
@@ -85,7 +84,7 @@ async function fetchItemDetails() {
 
 
 // Surveillance des changements de personnage via `watch`
-watch(selectedCharacter, async (newValue, oldValue) => {
+watch(selectedCharacter, async (newValue) => {
   if (newValue) {
     console.log(`Personnage sélectionné : ${newValue}`);
     itemsDetails.value = [];
@@ -103,9 +102,9 @@ watch(selectedCharacter, async (newValue, oldValue) => {
 </script>
 
 <template>
-  <section class="container pt-2 text-center mx-3">
-    <div class="row justify-content-center">
-      <div class="col-1  g-1" v-for="item in itemsDetails" :key="item.id">
+  <section class="container pt-2 text-center px-3">
+    <div class="row row-cols-auto">
+      <div class="col-1 g-1 " v-for="item in itemsDetails" :key="item.id">
         <div class="card">
           <img :src="item.icon" class="card-img" alt="Icone de l'item" />
           <div class="card-body p-0">
