@@ -75,11 +75,11 @@ watch(() => apiKeyStore.apiKey, fetchCharacterList);
 <template>
   <form>
       <div class="input-group mb-2 col-6 mx-auto">
-        <input type="password" class="form-control" id="idKey" v-model="currentApiKey" placeholder="xxxx-xxxx-xxxx-xxx">
+        <input class="form-control" id="idKey" v-model="currentApiKey" placeholder="xxxx-xxxx-xxxx-xxx">
         <button class="btn btn-outline-secondary" type="button" @click.prevent="handleApiKey">
           Submit ApiKey
         </button>
-        <button class="btn btn-toggle" :class="{ active: isBankActive }" @click="toggleBank">
+        <button class="btn btn-toggle" :class="{ active: isBankActive }" @click.prevent="toggleBank">
           Bank toggle
         </button>
       </div>
