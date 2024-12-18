@@ -87,7 +87,11 @@ onMounted(() => {
             <div class="col-1 g-1 " v-for="item in bankList" :key="item.id">
                 <div class="card">
                     <img v-if="getItemIcon(item.id)" :src="getItemIcon(item.id)" class="card-img" alt="Icone de l'item" />
-                    <p class="card-text mb-0 text-center">x{{ item.count }}</p>
+                    <div class="card-img-overlay">
+                        <p v-if = "Number(item.count)>1" class="card-text count-overlay">
+                            {{ item.count }}
+                        </p>
+                    </div>
                     <div class="card-body p-0">
                         <p v-if="getItemIcon(item.id)" class="card-title fs-7 mb-0">
                             {{ getItemName(item.id) }}
@@ -112,4 +116,23 @@ onMounted(() => {
 .card {
     max-height: 40vh;
 }
+
+.count-overlay {
+    position: absolute;
+    top:15%;
+    right: 20%;
+    font-size: 1rem;
+    font-weight: bold;
+    color: rgb(19, 19, 19);
+    background: rgba(237, 231, 231, 0.6);
+    backdrop-filter: blur(8px);
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%; /* Cercle parfait */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px rgba(0, 0, 0, 0.5);
+}
+
 </style>
