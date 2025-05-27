@@ -4,8 +4,6 @@ import { storeToRefs } from "pinia";
 import { useCharacterStore } from "../stores/characterStore.js";
 import { useApiKey } from "../stores/apiKeyStore.js";
 import axios from "axios";
-import bankComponent from "./bankComponent.vue";
-
 
 // Stores
 const apiKeyStore = useApiKey();
@@ -13,27 +11,15 @@ const characterStore = useCharacterStore();
 const { selectedCharacter } = storeToRefs(characterStore);
 
 // Réactifs
-const currentApiKey = ref(""); // Clé API pour le formulaire
-const characterList = ref([]); // Liste des personnages
-const isBankActive = ref(false); // State de la banque
-const bankComponentRef = ref(null);
-
-// Enregistrer la clé API dans le store
-function handleApiKey() {
-  if (!currentApiKey.value) {
-    console.error("Clé API invalide !");
-    return;
-  }
-  //Format de la clée avant enregistrement 
-  apiKeyStore.selectApiKey(currentApiKey.value);
-}
+const characterList = ref([]);
 
 // Récupérer la liste des personnages
 async function fetchCharacterList() {
   if (!apiKeyStore.apiKey) {
-    alert("Aucune clé API définie !");
+    console.log("Aucune clé API définie - en attente...");
     return;
   }
+
   const gw2ApiUrl = "https://api.guildwars2.com/v2/characters";
   try {
     const response = await axios.get(gw2ApiUrl, {
@@ -51,55 +37,34 @@ async function fetchCharacterList() {
 // Sélectionner un personnage
 function handleSelectCharacter(character) {
   characterStore.selectCharacter(character);
-  console.log(`Personnage sélectionné : ${selectedCharacter}`);
+  console.log(`Personnage sélectionné : ${character}`);
 }
 
-function toggleBank() {
-  isBankActive.value = !isBankActive.value;
-  if (isBankActive.value && bankComponentRef.value) {
-    bankComponentRef.value.fetchBank();
-    console.log("Banque activée et chargement des données lancé.");
-  }
-}
-
-function refreshBank() {
-  if (bankComponentRef.value) {
-    bankComponentRef.value.fetchBank(); // Rafraîchir les données manuellement
-    console.log("Données de la banque rafraîchies !");
-  }
-}
-
+// Auto-fetch sur changement API Key
 watch(() => apiKeyStore.apiKey, fetchCharacterList);
 </script>
 
 <template>
-  <form>
-      <div class="input-group mb-2 col-6 mx-auto">
-        <input class="form-control" id="idKey" v-model="currentApiKey" placeholder="xxxx-xxxx-xxxx-xxx">
-        <button class="btn btn-outline-secondary" type="button" @click.prevent="handleApiKey">
-          Submit ApiKey
-        </button>
-        <button class="btn btn-toggle" :class="{ active: isBankActive }" @click.prevent="toggleBank">
-          Bank toggle
-        </button>
-      </div>
-      <div class="text-center" v-show="isBankActive">
-        <button class="btn btn-outline-primary" @click.prevent="refreshBank">refresh bank</button>
-      </div>
-      <bankComponent v-show="isBankActive" ref="bankComponentRef" />
-  </form>
-  <ul class="nav nav-tabs">
-    <li class="nav-item" v-for="(item, index) in characterList" :key="index" @click="handleSelectCharacter(item)">
-      <a class="nav-link" href="#" :class="{ active: selectedCharacter === item }">
-        {{ item }}
-      </a>
-    </li>
-  </ul>
+  <div class="col-12">
+    <!-- Navigation personnages -->
+    <ul class="nav nav-tabs" v-if="characterList.length > 0">
+      <li class="nav-item" v-for="(item, index) in characterList" :key="index">
+        <a
+          class="nav-link"
+          href="#"
+          :class="{ active: selectedCharacter === item }"
+          @click.prevent="handleSelectCharacter(item)"
+        >
+          {{ item }}
+        </a>
+      </li>
+    </ul>
+
+    <!-- Message état vide -->
+    <div v-else class="text-center text-muted py-3">
+      <p>Aucun personnage disponible. Vérifiez votre clé API.</p>
+    </div>
+  </div>
 </template>
 
-<style>
-.nav-link.active {
-  background-color: #007bff;
-  color: white;
-}
-</style>
+<style></style>
