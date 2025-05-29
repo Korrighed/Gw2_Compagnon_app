@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
-import tailwindcss from '@tailwindcss/vite'
+
 
 export default ({ mode }) => {
     const env = loadEnv(mode, process.cwd());
@@ -8,7 +8,7 @@ export default ({ mode }) => {
     return defineConfig({
         base: env.VITE_BASE || "/",
         plugins: [vue(),
-        tailwindcss(),
+
 
         ],
         build: {

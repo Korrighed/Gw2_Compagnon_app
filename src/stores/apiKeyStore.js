@@ -5,21 +5,23 @@ export const useApiKey = defineStore("apiKeyStore", {
     apiKey: "",
   }),
 
+  getters: {
+    isValidApiKey: (state) => {
+      console.log("Vérification clé API:", state.apiKey);
+      return state.apiKey && state.apiKey.trim().length > 0;
+    },
+  },
+
   actions: {
-    // Enregistrer clé API
     selectApiKey(apiKey) {
       if (!apiKey) {
         console.error("Clé API invalide ou absente !");
         return;
       }
 
-      // Nettoyer et enregistrer
       const cleanApiKey = apiKey.trim().replace(/\s+/g, "");
       this.apiKey = cleanApiKey;
-
-      // Persister dans localStorage
       this.saveToLocalStorage(cleanApiKey);
-      console.log("Clé API enregistrée et persistée");
     },
 
     // Sauvegarder localStorage
