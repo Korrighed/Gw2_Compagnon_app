@@ -4,7 +4,7 @@ import { useApiKey } from '@/stores/apiKeyStore.js';
 // Instance Axios configurée
 const gw2Api = axios.create({
     baseURL: '/api/gw2',
-    timeout: 10000,
+    timeout: 25000,
     headers: {
         'Content-Type': 'application/json'
     }
@@ -97,4 +97,16 @@ export const gw2ApiService = {
         const idsString = ids.join(',');
         return gw2Api.get(`/v2/items?ids=${idsString}`);
     },
+
+    // Informations de base du personnage
+    getCharacterCore: (characterName) => {
+        if (!characterName?.trim()) throw new Error('Nom personnage requis');
+        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}/core`);
+    },
+
+    // Informations de crafting du personnage
+    getCharacterCrafting: (characterName) => {
+        if (!characterName?.trim()) throw new Error('Nom personnage requis');
+        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}/crafting`);
+    }
 };

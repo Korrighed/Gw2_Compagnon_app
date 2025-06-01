@@ -16,23 +16,78 @@ const characterList = ref([]);
 const isLoading = ref(false);
 const characterDetails = ref(new Map()); // Stocke les détails de chaque personnage
 
+// Utility function for retries
+async function withTimeout(promise, timeout = 12000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const result = await promise;
+    clearTimeout(timeoutId);
+    return result;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
 // Récupérer les détails d'un personnage
 async function fetchCharacterDetails(characterName) {
-  try {
-    const response = await gw2ApiService.getCharacterDetails(characterName);
-    const activeCrafting = response.data.crafting
-      .filter((craft) => craft.active)
-      .map((craft) => craft.discipline);
+  const maxRetries = 2;
+  let attempt = 0;
 
-    characterDetails.value.set(characterName, {
-      profession: response.data.profession,
-      crafting: activeCrafting,
-    });
-  } catch (error) {
-    console.error(
-      `Erreur lors de la récupération des détails pour ${characterName}:`,
-      error
-    );
+  while (attempt < maxRetries) {
+    try {
+      const [coreResponse, craftingResponse] = await Promise.allSettled([
+        withTimeout(gw2ApiService.getCharacterCore(characterName)),
+        withTimeout(gw2ApiService.getCharacterCrafting(characterName)),
+      ]);
+
+      // Traitement même si une requête échoue
+      const coreData =
+        coreResponse.status === "fulfilled" ? coreResponse.value.data : null;
+      const craftingData =
+        craftingResponse.status === "fulfilled"
+          ? craftingResponse.value.data.crafting // Accès au tableau via .crafting
+          : [];
+
+      const activeCrafting = Array.isArray(craftingData)
+        ? craftingData
+            .filter((craft) => craft.active === true) // Accès direct à craft.active
+            .map((craft) => craft.discipline) // Accès direct à craft.discipline
+        : [];
+
+      characterDetails.value.set(characterName, {
+        profession: coreData?.profession || "Classe non trouvée :(",
+        crafting: activeCrafting,
+      });
+
+      console.log(
+        `Chargement réussi pour ${characterName} (tentative ${attempt + 1})`
+      );
+      return;
+    } catch (error) {
+      attempt++;
+      console.warn(
+        `Échec du chargement pour ${characterName} (tentative ${attempt}/${maxRetries})`,
+        error.message // Ajout du message d'erreur spécifique
+      );
+
+      if (attempt === maxRetries) {
+        console.error(
+          `Échec définitif pour ${characterName} après ${maxRetries} tentatives`,
+          error.message
+        );
+        characterDetails.value.set(characterName, {
+          profession: "Classe non trouvée :(",
+          crafting: [],
+        });
+        return; // Sortir de la fonction après le nombre max de tentatives
+      }
+
+      // Attendre avant la prochaine tentative
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+    }
   }
 }
 
@@ -43,25 +98,32 @@ async function fetchCharacterList() {
     return;
   }
 
-  isLoading.value = true;
   try {
-    // 1. Récupérer la liste des personnages
+    // 1. Chargement rapide de la liste des personnages
     const response = await gw2ApiService.getCharacters();
     characterList.value = Array.isArray(response.data) ? response.data : [];
 
-    // 2. Charger les détails un par un
-    for (const character of characterList.value) {
-      await fetchCharacterDetails(character);
-      // Petit délai entre chaque requête pour éviter la surcharge
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-
-    console.log("Chargement complet des personnages et détails");
+    // 2. Lancer le chargement des détails en arrière-plan
+    setTimeout(() => {
+      loadCharacterDetails();
+    }, 100);
   } catch (error) {
     console.error("Erreur lors de la récupération des personnages:", error);
     characterList.value = [];
-  } finally {
-    isLoading.value = false;
+  }
+}
+
+// Nouvelle fonction pour charger les détails en arrière-plan
+async function loadCharacterDetails() {
+  const chunkSize = 2;
+  for (let i = 0; i < characterList.value.length; i += chunkSize) {
+    const chunk = characterList.value.slice(i, i + chunkSize);
+    await Promise.all(
+      chunk.map((character) => fetchCharacterDetails(character))
+    );
+    if (i + chunkSize < characterList.value.length) {
+      await new Promise((resolve) => setTimeout(resolve, 700));
+    }
   }
 }
 
@@ -113,9 +175,7 @@ onMounted(() => {
           <div class="col-2 d-flex align-items-start m-0 p-0">
             <div v-if="characterDetails.get(item)?.crafting.length">
               <span
-                v-for="(discipline, index) in characterDetails
-                  .get(item)
-                  .crafting.slice(0, 2)"
+                v-for="discipline in characterDetails.get(item).crafting"
                 :key="discipline"
                 class="crafting-icon"
                 :class="`crafting-${discipline.toLowerCase()}`"
