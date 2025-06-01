@@ -1,28 +1,29 @@
 import axios from 'axios';
 import { useApiKey } from '@/stores/apiKeyStore.js';
 
-const baseURL = import.meta.env.PROD
-    ? 'https://api.guildwars2.com/v2'
-    : '/api/gw2/v2';
+const baseURL = 'https://api.guildwars2.com/v2';
 
 // Instance Axios configurée
 const gw2Api = axios.create({
     baseURL,
     timeout: 25000,
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
     }
 });
 
-// Intercepteur requête - token automatique
+// Intercepteur requête - token via query parameter
 gw2Api.interceptors.request.use(
     (config) => {
         const apiKeyStore = useApiKey();
 
         if (apiKeyStore.isValidApiKey) {
-            config.headers.Authorization = `Bearer ${apiKeyStore.apiKey}`;
-        } else {
-            console.warn('Aucune clé API valide trouvée');
+            // Utilisation du query parameter au lieu du header
+            config.params = {
+                ...config.params,
+                access_token: apiKeyStore.apiKey
+            };
         }
 
         return config;
@@ -39,9 +40,10 @@ gw2Api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             console.error('Clé API invalide ou expirée');
-            // Optionnel: redirection vers page login
         } else if (error.response?.status === 403) {
             console.error('Permissions insuffisantes pour cette ressource');
+        } else if (error.code === 'ERR_NETWORK') {
+            console.error('Erreur CORS ou réseau:', error.message);
         }
         return Promise.reject(error);
     }

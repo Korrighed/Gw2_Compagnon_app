@@ -5,27 +5,14 @@ import { resolve } from "path";
 export default ({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   const isProd = mode === 'production' || mode === 'gh-pages';
+  const baseUrl = isProd ? '/Gw2_Compagnon_app/' : '/';
 
   return defineConfig({
-    base: mode === 'gh-pages' ? '/Gw2_Compagnon_app/' : '/',
+    base: baseUrl,
     plugins: [vue()],
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src')
-      }
-    },
-    server: {
-      proxy: isProd ? {} : {
-        '/api/gw2/v2': {
-          target: 'https://api.guildwars2.com/v2',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/gw2\/v2/, ''),
-          configure: (proxy, options) => {
-            proxy.on('proxyReq', (proxyReq, req, res) => {
-              console.log('Proxying request:', req.url);
-            });
-          }
-        }
       }
     },
     build: {
@@ -49,11 +36,7 @@ export default ({ mode }) => {
       },
       cssCodeSplit: true,
       sourcemap: !isProd,
-      minify: isProd,
-      assetsInlineLimit: 4096
-    },
-    optimizeDeps: {
-      include: ['vue', 'pinia', 'axios']
+      minify: isProd
     }
   });
 };
