@@ -63,7 +63,7 @@
 import { ref, reactive, computed, nextTick, onUnmounted } from "vue";
 import { itemDetailsService } from "@/utils/itemDetailsService.js";
 import { useItemCache } from "@/stores/itemCache";
-import "@/assets/styles/rarity.css";
+import "../../assets/styles/rarity.css";
 
 const itemCacheStore = useItemCache();
 

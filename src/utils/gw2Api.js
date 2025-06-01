@@ -1,9 +1,13 @@
 import axios from 'axios';
 import { useApiKey } from '@/stores/apiKeyStore.js';
 
+const baseURL = import.meta.env.PROD
+    ? 'https://api.guildwars2.com/v2'
+    : '/api/gw2/v2';
+
 // Instance Axios configurée
 const gw2Api = axios.create({
-    baseURL: '/api/gw2',
+    baseURL,
     timeout: 25000,
     headers: {
         'Content-Type': 'application/json'
@@ -43,19 +47,21 @@ gw2Api.interceptors.response.use(
     }
 );
 
+// Correction des routes (supprimer le /v2 redondant)
 export const gw2ApiService = {
     // Account - Banque
-    getBank: () => gw2Api.get('/v2/account/bank'),
+    getBank: () => gw2Api.get('/account/bank'),
 
     // Characters - Liste
-    getCharacters: () => gw2Api.get('/v2/characters'),
+    getCharacters: () => gw2Api.get('/characters'),
 
     // Character - Inventaire spécifique
     getCharacterInventory: (characterName) => {
         if (!characterName || !characterName.trim()) {
             throw new Error('Nom personnage requis');
         }
-        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}/inventory`);
+        // Suppression du /v2 redondant
+        return gw2Api.get(`/characters/${encodeURIComponent(characterName)}/inventory`);
     },
 
     // Character - Détails
@@ -63,7 +69,7 @@ export const gw2ApiService = {
         if (!characterName || !characterName.trim()) {
             throw new Error('Nom personnage requis');
         }
-        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}`);
+        return gw2Api.get(`/characters/${encodeURIComponent(characterName)}`);
     },
 
     // Items - Details multiples avec chunks
@@ -78,7 +84,8 @@ export const gw2ApiService = {
         for (let i = 0; i < uniqueIds.length; i += chunkSize) {
             const idsChunk = uniqueIds.slice(i, i + chunkSize);
             try {
-                const response = await gw2Api.get(`/v2/items?ids=${idsChunk.join(',')}`);
+                // Suppression du /v2 redondant
+                const response = await gw2Api.get(`/items?ids=${idsChunk.join(',')}`);
                 if (response.data && Array.isArray(response.data)) {
                     itemsDetails.push(...response.data);
                 }
@@ -95,18 +102,20 @@ export const gw2ApiService = {
             throw new Error('Liste IDs requise');
         }
         const idsString = ids.join(',');
-        return gw2Api.get(`/v2/items?ids=${idsString}`);
+        return gw2Api.get(`/items?ids=${idsString}`);
     },
 
     // Informations de base du personnage
     getCharacterCore: (characterName) => {
         if (!characterName?.trim()) throw new Error('Nom personnage requis');
-        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}/core`);
+        return gw2Api.get(`/characters/${encodeURIComponent(characterName)}/core`);
     },
 
     // Informations de crafting du personnage
     getCharacterCrafting: (characterName) => {
         if (!characterName?.trim()) throw new Error('Nom personnage requis');
-        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}/crafting`);
+        return gw2Api.get(`/characters/${encodeURIComponent(characterName)}/crafting`);
     }
 };
+
+

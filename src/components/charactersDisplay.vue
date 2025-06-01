@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useCharacterStore } from "../stores/characterStore.js";
 import { useApiKey } from "../stores/apiKeyStore.js";
 import { gw2ApiService } from "@/utils/gw2Api.js";
-import "@/assets/styles/crafting.css";
+import "../assets/styles/crafting.css";
 
 // Stores
 const apiKeyStore = useApiKey();
