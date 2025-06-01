@@ -62,6 +62,10 @@
 <script setup>
 import { ref, reactive, computed, nextTick } from "vue";
 import { itemDetailsService } from "@/utils/itemDetailsService.js";
+import { useItemCache } from "@/stores/itemCache";
+import "@/assets/styles/rarity.css";
+
+const itemCacheStore = useItemCache();
 
 // État tooltip
 const tooltip = reactive({
@@ -108,19 +112,16 @@ const rarityClass = computed(() => {
 const showTooltip = async (itemId, event) => {
   if (!itemId) return;
 
-  // Fermer les autres tooltips
-  hideAllTooltipsExcept(itemId);
-
   tooltip.position = { x: event.clientX, y: event.clientY };
 
-  if (itemCache.has(itemId)) {
-    tooltip.data = itemCache.get(itemId);
+  if (itemCacheStore.hasItem(itemId)) {
+    tooltip.data = itemCacheStore.getItem(itemId);
   } else {
     try {
       const items = await itemDetailsService.fetchItemDetails([itemId]);
-      const itemDetails = items[0]; // On prend le premier élément car on ne demande qu'un seul item
+      const itemDetails = items[0];
       if (itemDetails) {
-        itemCache.set(itemId, itemDetails);
+        itemCacheStore.setItem(itemId, itemDetails);
         tooltip.data = itemDetails;
       }
     } catch (error) {
@@ -130,9 +131,7 @@ const showTooltip = async (itemId, event) => {
   }
 
   tooltip.visible = true;
-  activeTooltips.value.add(itemId);
 
-  // Ajustement position si débordement écran
   await nextTick(() => {
     if (tooltipRef.value) {
       adjustTooltipPosition();
@@ -177,6 +176,32 @@ const adjustTooltipPosition = () => {
   max-width: 300px;
   min-width: 200px;
 }
+
+.rarity-junk {
+  --rarity-color: var(--rarity-junk);
+}
+.rarity-basic {
+  --rarity-color: var(--rarity-basic);
+}
+.rarity-fine {
+  --rarity-color: var(--rarity-fine);
+}
+.rarity-masterwork {
+  --rarity-color: var(--rarity-masterwork);
+}
+.rarity-rare {
+  --rarity-color: var(--rarity-rare);
+}
+.rarity-exotic {
+  --rarity-color: var(--rarity-exotic);
+}
+.rarity-ascended {
+  --rarity-color: var(--rarity-ascended);
+}
+.rarity-legendary {
+  --rarity-color: var(--rarity-legendary);
+}
+
 .card {
   border: 2px solid var(--rarity-color, #444);
   transition: border-color 0.2s ease;
@@ -216,39 +241,6 @@ const adjustTooltipPosition = () => {
   background: rgba(253, 244, 244, 0.1);
   color: white;
   backdrop-filter: blur(5px);
-}
-
-/* Classes de rareté */
-.rarity-junk {
-  --rarity-color: #aaa; /* Gris */
-}
-
-.rarity-basic {
-  --rarity-color: #000; /* Noir */
-}
-
-.rarity-fine {
-  --rarity-color: #0066bb; /* Bleu foncé */
-}
-
-.rarity-masterwork {
-  --rarity-color: #006644; /* Vert foncé */
-}
-
-.rarity-rare {
-  --rarity-color: #dadd11; /* Jaune */
-}
-
-.rarity-exotic {
-  --rarity-color: #e7650f; /* Orange */
-}
-
-.rarity-ascended {
-  --rarity-color: #ff69b4; /* Rose */
-}
-
-.rarity-legendary {
-  --rarity-color: #4b0082; /* Violet */
 }
 
 /* Application des couleurs */
