@@ -16,19 +16,28 @@
 
     <!-- Corps accordéon avec inventaire -->
     <div v-show="isActive" class="widget-body">
+      <!-- Ajout de la barre de recherche -->
+      <SearchBar v-model="searchQuery" />
+
       <!-- Loading state -->
       <div v-if="isLoading" class="loading-inventory text-center py-4">
         <p>Chargement des objets...</p>
       </div>
 
       <!-- Empty state -->
-      <div v-else-if="!items.length" class="empty-inventory text-center py-4">
+      <div
+        v-else-if="!filteredItems.length"
+        class="empty-inventory text-center py-4"
+      >
         <p class="text-muted">{{ emptyMessage }}</p>
       </div>
 
-      <!-- Items grid -->
+      <!-- Items grid avec items filtrés -->
       <div v-else class="bank-inventory-grid">
-        <ItemTooltipProvider v-for="(item, index) in items" :key="index">
+        <ItemTooltipProvider
+          v-for="(item, index) in filteredItems"
+          :key="index"
+        >
           <template #default="{ showTooltip, hideTooltip }">
             <div
               class="inventory-slot has-item"
@@ -62,6 +71,7 @@ import { ref, computed } from "vue";
 import { itemDetailsService } from "../../utils/itemDetailsService.js";
 import chevronIcon from "@/assets/Icon/caret-down.svg";
 import ItemTooltipProvider from "./ItemTooltipProvider.vue";
+import SearchBar from "./SearchBar.vue";
 
 // Props
 const props = defineProps({
@@ -95,6 +105,20 @@ const emit = defineEmits(["toggle"]);
 
 // État accordion
 const isActive = ref(false);
+
+// Ajout de l'état de recherche
+const searchQuery = ref("");
+
+// Computed pour filtrer les items
+const filteredItems = computed(() => {
+  if (!searchQuery.value.trim()) return props.items;
+
+  const query = searchQuery.value.toLowerCase().trim();
+  return props.items.filter((item) => {
+    const itemName = getItemName(item.id).toLowerCase();
+    return itemName.includes(query);
+  });
+});
 
 // Méthodes
 const toggleAccordion = () => {
