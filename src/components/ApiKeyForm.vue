@@ -3,7 +3,7 @@
     <!-- Affichage si clé existante -->
     <div v-if="apiKeyStore.isValidApiKey" class="d-flex col-md-10 col-7">
       <input
-        class="form-control glassmorphism me-md-4 me-4 col-md-6 col-6"
+        class="form-control glassmorphism me-md-4 me-4 col-md-6 col-6 p-lg-3"
         :value="maskedApiKey"
         readonly
         placeholder="Clé API enregistrée"

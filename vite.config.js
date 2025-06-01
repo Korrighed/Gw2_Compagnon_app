@@ -13,6 +13,16 @@ export default ({ mode }) => {
                 '@': resolve(__dirname, 'src')
             }
         },
+        server: {
+            proxy: {
+                '/api/gw2': {
+                    target: 'https://api.guildwars2.com',
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/api\/gw2/, ''),
+                    secure: true
+                }
+            }
+        },
         build: {
             watch: {
                 exclude: ["dist/**"],

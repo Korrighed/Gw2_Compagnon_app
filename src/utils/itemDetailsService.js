@@ -1,15 +1,13 @@
-import axios from "axios";
-
+import { gw2ApiService } from '@/utils/gw2Api.js';
 /**
  * Service récupération détails items GW2
  */
 class ItemDetailsService {
     constructor() {
-        this.baseUrl = "https://api.guildwars2.com/v2/items";
         this.defaultChunkSize = 200;
     }
 
-    /**
+    /**&
      * Récupère détails items par chunks
      * @param {Array} itemIds - Liste IDs items
      * @param {number} chunkSize - Taille chunk (défaut: 200)
@@ -20,27 +18,14 @@ class ItemDetailsService {
             return [];
         }
 
-        const itemsDetails = [];
-        const uniqueIds = [...new Set(itemIds)]; // Dédoublonnage
-
-        for (let i = 0; i < uniqueIds.length; i += chunkSize) {
-            const idsChunk = uniqueIds.slice(i, i + chunkSize).join(",");
-
-            try {
-                const response = await axios.get(this.baseUrl, {
-                    params: { ids: idsChunk },
-                });
-
-                if (response.data && Array.isArray(response.data)) {
-                    itemsDetails.push(...response.data);
-                }
-            } catch (error) {
-                console.error(`Erreur chunk ${i}-${i + chunkSize}:`, error.message);
-                // Continue traitement autres chunks
-            }
+        try {
+            const itemsData = await gw2ApiService.getItemsChunked(itemIds, chunkSize);
+            console.log('Items récupérés:', itemsData.length);
+            return itemsData;
+        } catch (error) {
+            console.error('Erreur service items:', error);
+            return [];
         }
-
-        return itemsDetails;
     }
 
     /**
