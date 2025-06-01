@@ -18,9 +18,12 @@ export default ({ mode }) => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
+      // Ajout de la configuration pour les assets
       rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'index.html')
+        },
         output: {
-          manualChunks: undefined,
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
           assetFileNames: ({ name }) => {
@@ -33,10 +36,7 @@ export default ({ mode }) => {
             return 'assets/[name]-[hash][extname]';
           }
         }
-      },
-      cssCodeSplit: true,
-      sourcemap: !isProd,
-      minify: isProd
+      }
     }
   });
 };
