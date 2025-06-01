@@ -110,13 +110,21 @@ const rarityClass = computed(() => {
 
 // Ajouter un debounce timer
 let tooltipTimer = null;
-const TOOLTIP_DELAY = 50; // 50ms de délai
+const TOOLTIP_DELAY = 150; // Augmenté à 150ms
+const TOOLTIP_HIDE_DELAY = 100; // Nouveau délai pour masquer
+let hideTooltipTimer = null; // Nouveau timer pour masquer
 
 // Méthodes exposées via slot
 const showTooltip = async (itemId, event) => {
   if (!itemId) return;
 
-  // Nettoyer le timer existant
+  // Annuler le timer de masquage si existant
+  if (hideTooltipTimer) {
+    clearTimeout(hideTooltipTimer);
+    hideTooltipTimer = null;
+  }
+
+  // Nettoyer le timer d'affichage existant
   if (tooltipTimer) {
     clearTimeout(tooltipTimer);
   }
@@ -124,18 +132,26 @@ const showTooltip = async (itemId, event) => {
   // Cacher tous les autres tooltips
   hideAllTooltipsExcept(itemId);
 
-  // Mettre à jour la position immédiatement
-  tooltip.position = { x: event.clientX, y: event.clientY };
-
-  // Si l'item est déjà en cache, l'afficher immédiatement
-  if (itemCacheStore.hasItem(itemId)) {
-    tooltip.data = itemCacheStore.getItem(itemId);
-    tooltip.visible = true;
+  // Si c'est le même item déjà affiché, ne pas relancer la requête
+  if (tooltip.visible && tooltip.data?.id === itemId) {
+    tooltip.position = { x: event.clientX, y: event.clientY };
     adjustTooltipPosition();
     return;
   }
 
-  // Sinon, charger avec un petit délai pour éviter les requêtes inutiles
+  tooltip.position = { x: event.clientX, y: event.clientY };
+
+  // Utiliser le cache si disponible
+  if (itemCacheStore.hasItem(itemId)) {
+    tooltipTimer = setTimeout(() => {
+      tooltip.data = itemCacheStore.getItem(itemId);
+      tooltip.visible = true;
+      adjustTooltipPosition();
+    }, TOOLTIP_DELAY);
+    return;
+  }
+
+  // Sinon, charger avec délai
   tooltipTimer = setTimeout(async () => {
     try {
       const items = await itemDetailsService.fetchItemDetails([itemId]);
@@ -162,8 +178,12 @@ const hideTooltip = () => {
     clearTimeout(tooltipTimer);
     tooltipTimer = null;
   }
-  tooltip.visible = false;
-  tooltip.data = null;
+
+  // Ajouter un délai avant de masquer
+  hideTooltipTimer = setTimeout(() => {
+    tooltip.visible = false;
+    tooltip.data = null;
+  }, TOOLTIP_HIDE_DELAY);
 };
 
 const hideAllTooltipsExcept = (itemId) => {
