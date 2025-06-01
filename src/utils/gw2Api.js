@@ -58,6 +58,14 @@ export const gw2ApiService = {
         return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}/inventory`);
     },
 
+    // Character - Détails
+    getCharacterDetails: (characterName) => {
+        if (!characterName || !characterName.trim()) {
+            throw new Error('Nom personnage requis');
+        }
+        return gw2Api.get(`/v2/characters/${encodeURIComponent(characterName)}`);
+    },
+
     // Items - Details multiples avec chunks
     getItemsChunked: async (ids, chunkSize = 200) => {
         if (!Array.isArray(ids) || ids.length === 0) {

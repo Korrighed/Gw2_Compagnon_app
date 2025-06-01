@@ -48,7 +48,7 @@
 
             <p
               v-if="tooltip.data.details?.description"
-              class="card-text small text-muted mb-0"
+              class="card-text text-white mb-0"
             >
               {{ tooltip.data.details.description }}
             </p>
@@ -170,7 +170,7 @@ const adjustTooltipPosition = () => {
 <style scoped>
 .item-tooltip {
   pointer-events: none;
-  animation: fadeIn 0.2s ease-in;
+  animation: fadeIn 0.08s ease-in;
   position: fixed;
   z-index: 9999;
   max-width: 300px;
@@ -205,7 +205,7 @@ const adjustTooltipPosition = () => {
 .card {
   border: 2px solid var(--rarity-color, #444);
   transition: border-color 0.2s ease;
-  background: rgba(0, 0, 0, 0.349);
+  background: rgba(0, 0, 0, 0.781);
   color: white;
   backdrop-filter: blur(5px);
 }

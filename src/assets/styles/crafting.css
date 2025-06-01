@@ -1,0 +1,59 @@
+:root {
+  --crafting-armorsmith: url('../disciplines/Master_Armorsmith.png');
+  --crafting-artificer: url('../disciplines/Master_Artificer.png');
+  --crafting-chef: url('../disciplines/Master_Chef.png');
+  --crafting-huntsman: url('../disciplines/Master_Huntsman.png');
+  --crafting-jeweler: url('../disciplines/Master_Jeweler.png');
+  --crafting-leatherworker: url('../disciplines/Master_Leatherworker.png');
+  --crafting-scribe: url('../disciplines/Master_Scribe.png');
+  --crafting-tailor: url('../disciplines/Master_Tailor.png');
+  --crafting-weaponsmith: url('../disciplines/Master_Weaponsmith.png');
+}
+
+/* Classes pour l'utilisation des icônes */
+.crafting-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.crafting-armorsmith {
+  background-image: var(--crafting-armorsmith);
+}
+
+.crafting-artificer {
+  background-image: var(--crafting-artificer);
+}
+
+.crafting-chef {
+  background-image: var(--crafting-chef);
+}
+
+.crafting-huntsman {
+  background-image: var(--crafting-huntsman);
+}
+
+.crafting-jeweler {
+  background-image: var(--crafting-jeweler);
+}
+
+.crafting-leatherworker {
+  background-image: var(--crafting-leatherworker);
+}
+
+.crafting-scribe {
+  background-image: var(--crafting-scribe);
+}
+
+.crafting-tailor {
+  background-image: var(--crafting-tailor);
+}
+
+.crafting-weaponsmith {
+  background-image: var(--crafting-weaponsmith);
+}
