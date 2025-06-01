@@ -16,34 +16,37 @@
 
     <!-- Corps accordéon avec inventaire -->
     <div v-show="isActive" class="widget-body">
-      <!-- Grille inventaire -->
-      <div v-if="items.length > 0" class="bank-inventory-grid">
-        <div
-          v-for="(item, index) in items"
-          :key="index"
-          class="inventory-slot has-item"
-          :title="getItemTooltip(item)"
-          :data-slot="index"
-        >
-          <img
-            :src="getItemIcon(item.id)"
-            :alt="getItemName(item.id)"
-            class="item-icon"
-          />
-          <div v-if="item.count > 1" class="item-count">
-            {{ item.count }}
-          </div>
-        </div>
+      <!-- Loading state -->
+      <div v-if="isLoading" class="loading-inventory text-center py-4">
+        <p>Chargement des objets...</p>
       </div>
 
-      <!-- Message si vide -->
-      <div v-else-if="!isLoading" class="empty-inventory text-center py-4">
+      <!-- Empty state -->
+      <div v-else-if="!items.length" class="empty-inventory text-center py-4">
         <p class="text-muted">{{ emptyMessage }}</p>
       </div>
 
-      <!-- Loading -->
-      <div v-if="isLoading" class="loading-inventory">
-        <p>Chargement des items...</p>
+      <!-- Items grid -->
+      <div v-else class="bank-inventory-grid">
+        <ItemTooltipProvider v-for="(item, index) in items" :key="index">
+          <template #default="{ showTooltip, hideTooltip }">
+            <div
+              class="inventory-slot has-item"
+              :data-slot="index"
+              @mouseenter="(e) => showTooltip(item.id, e)"
+              @mouseleave="hideTooltip"
+            >
+              <img
+                :src="getItemIcon(item.id)"
+                :alt="getItemName(item.id)"
+                class="item-icon"
+              />
+              <div v-if="item.count > 1" class="item-count">
+                {{ item.count }}
+              </div>
+            </div>
+          </template>
+        </ItemTooltipProvider>
       </div>
 
       <!-- Slot pour contrôles spécifiques -->
@@ -55,15 +58,19 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { itemDetailsService } from "../../utils/itemDetailsService.js";
 import chevronIcon from "@/assets/Icon/caret-down.svg";
+import ItemTooltipProvider from "./ItemTooltipProvider.vue";
 
 // Props
 const props = defineProps({
   title: {
-    type: String,
-    required: true,
+    title: String,
+    items: Array,
+    itemsDetails: Array,
+    isLoading: Boolean,
+    emptyMessage: String,
   },
   items: {
     type: Array,

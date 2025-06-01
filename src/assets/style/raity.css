@@ -1,0 +1,10 @@
+:root {
+    --rarity-junk: #aaa;
+    --rarity-basic: #000;
+    --rarity-fine: #0066bb;
+    --rarity-masterwork: #006644;
+    --rarity-rare: #dadd11;
+    --rarity-exotic: #e7650f;
+    --rarity-ascended: #ff69b4;
+    --rarity-legendary: #4b0082;
+}
