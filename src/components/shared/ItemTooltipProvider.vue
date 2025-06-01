@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, nextTick } from "vue";
+import { ref, reactive, computed, nextTick, onUnmounted } from "vue";
 import { itemDetailsService } from "@/utils/itemDetailsService.js";
 import { useItemCache } from "@/stores/itemCache";
 import "@/assets/styles/rarity.css";
@@ -108,62 +108,106 @@ const rarityClass = computed(() => {
   return `rarity-${tooltip.data.rarity.toLowerCase()}`;
 });
 
+// Ajouter un debounce timer
+let tooltipTimer = null;
+const TOOLTIP_DELAY = 50; // 50ms de délai
+
 // Méthodes exposées via slot
 const showTooltip = async (itemId, event) => {
   if (!itemId) return;
 
+  // Nettoyer le timer existant
+  if (tooltipTimer) {
+    clearTimeout(tooltipTimer);
+  }
+
+  // Cacher tous les autres tooltips
+  hideAllTooltipsExcept(itemId);
+
+  // Mettre à jour la position immédiatement
   tooltip.position = { x: event.clientX, y: event.clientY };
 
+  // Si l'item est déjà en cache, l'afficher immédiatement
   if (itemCacheStore.hasItem(itemId)) {
     tooltip.data = itemCacheStore.getItem(itemId);
-  } else {
+    tooltip.visible = true;
+    adjustTooltipPosition();
+    return;
+  }
+
+  // Sinon, charger avec un petit délai pour éviter les requêtes inutiles
+  tooltipTimer = setTimeout(async () => {
     try {
       const items = await itemDetailsService.fetchItemDetails([itemId]);
       const itemDetails = items[0];
       if (itemDetails) {
         itemCacheStore.setItem(itemId, itemDetails);
         tooltip.data = itemDetails;
+        tooltip.visible = true;
+        await nextTick(() => {
+          if (tooltipRef.value) {
+            adjustTooltipPosition();
+          }
+        });
       }
     } catch (error) {
       console.error("Erreur chargement item tooltip:", error);
-      return;
+      tooltip.visible = false;
     }
-  }
-
-  tooltip.visible = true;
-
-  await nextTick(() => {
-    if (tooltipRef.value) {
-      adjustTooltipPosition();
-    }
-  });
+  }, TOOLTIP_DELAY);
 };
 
 const hideTooltip = () => {
+  if (tooltipTimer) {
+    clearTimeout(tooltipTimer);
+    tooltipTimer = null;
+  }
   tooltip.visible = false;
-  activeTooltips.value.clear();
+  tooltip.data = null;
 };
 
 const hideAllTooltipsExcept = (itemId) => {
-  activeTooltips.value.forEach((id) => {
-    if (id !== itemId) {
-      tooltip.visible = false;
-      activeTooltips.value.delete(id);
-    }
-  });
+  if (tooltip.visible && tooltip.data?.id !== itemId) {
+    hideTooltip();
+  }
 };
 
+// Ajouter un cleanup au unmount
+onUnmounted(() => {
+  if (tooltipTimer) {
+    clearTimeout(tooltipTimer);
+  }
+  hideTooltip();
+});
+
+// Améliorer adjustTooltipPosition
 const adjustTooltipPosition = () => {
+  if (!tooltipRef.value) return;
+
   const rect = tooltipRef.value.getBoundingClientRect();
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
+  const padding = 10;
 
+  // Ajuster horizontalement
   if (rect.right > viewportWidth) {
-    tooltip.position.x = viewportWidth - rect.width - 10;
+    tooltip.position.x = Math.max(
+      padding,
+      viewportWidth - rect.width - padding
+    );
   }
+
+  // Ajuster verticalement
   if (rect.bottom > viewportHeight) {
-    tooltip.position.y = tooltip.position.y - rect.height - 20;
+    tooltip.position.y = Math.max(
+      padding,
+      viewportHeight - rect.height - padding
+    );
   }
+
+  // Empêcher le tooltip de sortir à gauche ou en haut
+  tooltip.position.x = Math.max(padding, tooltip.position.x);
+  tooltip.position.y = Math.max(padding, tooltip.position.y);
 };
 </script>
 
@@ -232,6 +276,8 @@ const adjustTooltipPosition = () => {
 
 .table {
   margin-bottom: 0.5rem;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .table td {

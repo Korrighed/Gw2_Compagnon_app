@@ -42,14 +42,21 @@ const error = ref(null);
 const inventorySlots = computed(() => {
   if (!inventoryList.value?.bags) return [];
 
+  // Extraire uniquement les IDs et informations essentielles
   return inventoryList.value.bags
-    .flatMap((bag) => bag?.inventory || [])
-    .filter((item) => item !== null)
-    .map((item) => ({
-      id: item.id,
-      count: item.count || 1,
-      binding: item.binding || null,
-    }));
+    .flatMap((bag) => {
+      if (!bag || !Array.isArray(bag.inventory)) return [];
+
+      // Ne garder que les informations essentielles pour chaque item
+      return bag.inventory
+        .filter((item) => item !== null)
+        .map((item) => ({
+          id: item.id,
+          count: item.count || 1,
+          binding: item.binding || null,
+        }));
+    })
+    .filter((item) => item !== null);
 });
 
 // Méthodes pour l'API
@@ -81,6 +88,7 @@ const fetchInventory = async () => {
 };
 
 const fetchItemsDetails = async () => {
+  // Extraire uniquement les IDs uniques des items
   const uniqueItemIds = [
     ...new Set(
       inventoryList.value.bags
@@ -96,6 +104,7 @@ const fetchItemsDetails = async () => {
   }
 
   try {
+    // Utiliser directement itemDetailsService sans transformation supplémentaire
     itemsDetails.value = await itemDetailsService.fetchItemDetails(
       uniqueItemIds
     );
