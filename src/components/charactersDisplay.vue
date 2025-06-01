@@ -151,41 +151,111 @@ onMounted(() => {
       <span class="loading-text">Personnages en cours de chargement...</span>
     </div>
 
-    <!-- Navigation personnages -->
-    <div v-else-if="characterList.length > 0" class="character-grid">
-      <div
-        v-for="(item, index) in characterList"
-        :key="index"
-        class="character-card"
-        :class="{ active: selectedCharacter === item }"
-        @click="handleSelectCharacter(item)"
-      >
-        <div class="character-content row g-0">
-          <!-- Section principale (2/3) -->
-          <div class="col-10 main-info">
-            <div class="character-header">
-              <span class="character-name">{{ item }}</span>
-            </div>
-            <div class="profession">
-              {{ characterDetails.get(item)?.profession }}
-            </div>
-          </div>
+    <template v-else-if="characterList.length > 0">
+      <!-- Desktop Grid (masqué sur mobile) -->
+      <div class="d-none d-lg-block">
+        <div class="character-grid">
+          <div
+            v-for="(item, index) in characterList"
+            :key="index"
+            class="character-card"
+            :class="{ active: selectedCharacter === item }"
+            @click="handleSelectCharacter(item)"
+          >
+            <div class="character-content row g-0">
+              <!-- Section principale (2/3) -->
+              <div class="col-10 main-info">
+                <div class="character-header">
+                  <span class="character-name">{{ item }}</span>
+                </div>
+                <div class="profession">
+                  {{ characterDetails.get(item)?.profession }}
+                </div>
+              </div>
 
-          <!-- Section crafting (1/3) -->
-          <div class="col-2 d-flex align-items-start m-0 p-0">
-            <div v-if="characterDetails.get(item)?.crafting.length">
-              <span
-                v-for="discipline in characterDetails.get(item).crafting"
-                :key="discipline"
-                class="crafting-icon"
-                :class="`crafting-${discipline.toLowerCase()}`"
-                :title="discipline"
-              ></span>
+              <!-- Section crafting (1/3) -->
+              <div class="col-2 d-flex align-items-start m-0 p-0">
+                <div v-if="characterDetails.get(item)?.crafting.length">
+                  <span
+                    v-for="discipline in characterDetails.get(item).crafting"
+                    :key="discipline"
+                    class="crafting-icon"
+                    :class="`crafting-${discipline.toLowerCase()}`"
+                    :title="discipline"
+                  ></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Mobile Menu (masqué sur desktop) -->
+      <div class="d-lg-none">
+        <div class="dropdown">
+          <button
+            class="btn dropdown-toggle w-100 character-button"
+            :class="{ 'character-selected': selectedCharacter }"
+            type="button"
+            id="dropdownMenuButton"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <template v-if="selectedCharacter">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="character-name">{{ selectedCharacter }}</span>
+                  <small class="d-block">
+                    {{ characterDetails.get(selectedCharacter)?.profession }}
+                  </small>
+                </div>
+                <div class="crafting-icons">
+                  <span
+                    v-for="discipline in characterDetails.get(selectedCharacter)
+                      ?.crafting"
+                    :key="discipline"
+                    class="crafting-icon"
+                    :class="`crafting-${discipline.toLowerCase()}`"
+                    :title="discipline"
+                  ></span>
+                </div>
+              </div>
+            </template>
+            <template v-else> Sélectionnez un personnage </template>
+          </button>
+          <ul
+            class="dropdown-menu dropdown-menu-dark w-100"
+            aria-labelledby="dropdownMenuButton"
+          >
+            <li v-for="(item, index) in characterList" :key="index">
+              <!-- Ajouter data-bs-toggle="dropdown" sur le lien -->
+              <a
+                class="dropdown-item d-flex justify-content-between align-items-center"
+                :class="{ active: selectedCharacter === item }"
+                @click="handleSelectCharacter(item)"
+                data-bs-toggle="dropdown"
+              >
+                <div>
+                  <span class="character-name">{{ item }}</span>
+                  <small class="d-block">{{
+                    characterDetails.get(item)?.profession
+                  }}</small>
+                </div>
+                <div class="crafting-icons">
+                  <span
+                    v-for="discipline in characterDetails.get(item)?.crafting"
+                    :key="discipline"
+                    class="crafting-icon"
+                    :class="`crafting-${discipline.toLowerCase()}`"
+                    :title="discipline"
+                  ></span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </template>
 
     <!-- Message état vide -->
     <div v-else class="text-center py-3">
@@ -287,6 +357,87 @@ onMounted(() => {
   }
   100% {
     opacity: 0.4;
+  }
+}
+
+/* Ajout styles mobile */
+.dropdown-menu {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 1);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.dropdown-menu-dark {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-item {
+  color: white;
+  padding: 0.75rem 1rem;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.character-button {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.75rem 1rem; /* Même padding que dropdown-item */
+  height: 6rem;
+  transition: all 0.3s ease;
+  text-align: left; /* Alignement à gauche comme les items */
+}
+
+.character-button.character-selected {
+  background: linear-gradient(
+    to right,
+    rgba(220, 53, 69, 0.6),
+    rgba(0, 0, 0, 0.6)
+  );
+  border-left: 4px solid rgba(220, 53, 69, 0.8);
+}
+
+/* Style commun pour le hover du bouton et des items */
+.character-button:hover,
+.dropdown-item:hover {
+  background: linear-gradient(
+    to right,
+    rgba(220, 53, 69, 0.6),
+    rgba(0, 0, 0, 0.6)
+  );
+  border-left: 4px solid rgba(220, 53, 69, 0.8);
+  color: white;
+}
+
+/* Ajuster le style des éléments internes pour qu'ils correspondent */
+.character-button .character-info,
+.dropdown-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.character-button small,
+.dropdown-item small {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.crafting-icons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .crafting-icon {
+    width: 3vh;
+    height: 3vh;
   }
 }
 </style>
