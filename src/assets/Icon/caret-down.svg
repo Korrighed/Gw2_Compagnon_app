@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1080" height="1080" viewBox="0 0 1080 1080" xml:space="preserve">
+<desc>Created with Fabric.js 5.2.4</desc>
+<defs>
+</defs>
+<g transform="matrix(1 0 0 1 540 540)" id="2c0efa03-7e2a-429d-a96e-0823c4560123"  >
+<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; visibility: hidden;" vector-effect="non-scaling-stroke"  x="-540" y="-540" rx="0" ry="0" width="1080" height="1080" />
+</g>
+<g transform="matrix(1 0 0 1 540 540)" id="d469cfcd-bb0e-4912-b16e-0b875370d810"  >
+</g>
+<g transform="matrix(21.6 0 0 21.6 540 540)"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1;"  transform=" translate(-25, -18)" d="M 49.334 5.48127 L 26.6079 34.6447 C 26.3968 34.9158 26.1462 35.1309 25.8703 35.2777 C 25.5944 35.4245 25.2987 35.5 25 35.5 C 24.7013 35.5 24.4056 35.4245 24.1297 35.2777 C 23.8538 35.1309 23.6032 34.9158 23.3921 34.6447 L 0.666003 5.48127 C 0.239568 4.93405 0 4.19185 0 3.41796 C 0 2.64407 0.239568 1.90187 0.666003 1.35465 C 1.09244 0.807426 1.67081 0.5 2.27388 0.5 C 2.87695 0.5 3.45531 0.807426 3.88175 1.35465 L 25 28.4584 L 46.1182 1.35465 C 46.3294 1.08369 46.5801 0.868757 46.856 0.722115 C 47.1318 0.575474 47.4275 0.5 47.7261 0.5 C 48.0247 0.5 48.3204 0.575474 48.5963 0.722115 C 48.8722 0.868757 49.1228 1.08369 49.334 1.35465 C 49.5451 1.62561 49.7126 1.94728 49.8269 2.30131 C 49.9412 2.65533 50 3.03477 50 3.41796 C 50 3.80115 49.9412 4.18059 49.8269 4.53462 C 49.7126 4.88864 49.5451 5.21032 49.334 5.48127 Z" stroke-linecap="round" />
+</g>
+</svg>

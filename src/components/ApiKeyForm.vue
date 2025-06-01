@@ -1,36 +1,33 @@
 <template>
-  <div class="input-group my-3">
+  <div class="input-group my-3 p-0 align-items-center">
     <!-- Affichage si clé existante -->
-    <div
-      v-if="apiKeyStore.isValidApiKey"
-      class="d-flex align-items-center col-12"
-    >
+    <div v-if="apiKeyStore.isValidApiKey" class="d-flex col-md-10 col-7">
       <input
-        class="form-control glassmorphism text-white me-2"
+        class="form-control glassmorphism me-md-4 me-4 col-md-6 col-6"
         :value="maskedApiKey"
         readonly
         placeholder="Clé API enregistrée"
       />
       <button
-        class="btn text-white glassmorphism col-2"
+        class="btn text-white glassmorphism text-white ms-md-1 col-md-2 col-7 p-2"
         type="button"
         @click="clearApiKey"
       >
-        Changer de clé
+        Changez de clé
       </button>
     </div>
 
     <!-- Formulaire si aucune clé -->
-    <div v-else class="d-flex col-12">
+    <div v-else class="d-flex col-md-10 col-7">
       <input
-        class="form-control glassmorphism me-2"
+        class="form-control glassmorphism me-md-4 me-4 col-md-6 col-6"
         id="idKey"
         v-model="currentApiKey"
         placeholder="xxxx-xxxx-xxxx-xxx"
         @keyup.enter="handleApiKey"
       />
       <button
-        class="btn btn-outline-secondary glassmorphism text-white col-2"
+        class="btn btn-outline-secondary glassmorphism text-white ms-md-1 col-md-2 col-7 p-2"
         type="button"
         @click.prevent="handleApiKey"
       >
@@ -78,6 +75,7 @@ function clearApiKey() {
 
 <style>
 .button {
+  border: 1px solid red !important;
 }
 
 .button:hover {
