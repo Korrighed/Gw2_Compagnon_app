@@ -108,81 +108,76 @@ const rarityClass = computed(() => {
   return `rarity-${tooltip.data.rarity.toLowerCase()}`;
 });
 
-// Ajouter un debounce timer
-let tooltipTimer = null;
-const TOOLTIP_DELAY = 150; // Augmenté à 150ms
-const TOOLTIP_HIDE_DELAY = 100; // Nouveau délai pour masquer
-let hideTooltipTimer = null; // Nouveau timer pour masquer
+// Modifier les constantes de temps
+const TOOLTIP_DELAY = 300; // Augmenté à 300ms pour éviter les déclenchements accidentels
+const TOOLTIP_HIDE_DELAY = 100; // Augmenté à 100ms pour une meilleure transition
 
-// Méthodes exposées via slot
+// Ajouter une variable globale pour tracker le tooltip actif
+const activeTooltipId = ref(null);
+
+// Modifier la fonction showTooltip
 const showTooltip = async (itemId, event) => {
   if (!itemId) return;
 
-  // Annuler le timer de masquage si existant
-  if (hideTooltipTimer) {
-    clearTimeout(hideTooltipTimer);
-    hideTooltipTimer = null;
+  // Si un autre tooltip est déjà actif, on le ferme immédiatement
+  if (activeTooltipId.value && activeTooltipId.value !== itemId) {
+    tooltip.visible = false;
+    tooltip.data = null;
   }
 
-  // Nettoyer le timer d'affichage existant
+  // Mettre à jour l'ID actif
+  activeTooltipId.value = itemId;
+
   if (tooltipTimer) {
     clearTimeout(tooltipTimer);
   }
-
-  // Cacher tous les autres tooltips
-  hideAllTooltipsExcept(itemId);
-
-  // Si c'est le même item déjà affiché, ne pas relancer la requête
-  if (tooltip.visible && tooltip.data?.id === itemId) {
-    tooltip.position = { x: event.clientX, y: event.clientY };
-    adjustTooltipPosition();
-    return;
+  if (hideTooltipTimer) {
+    clearTimeout(hideTooltipTimer);
   }
 
   tooltip.position = { x: event.clientX, y: event.clientY };
 
-  // Utiliser le cache si disponible
-  if (itemCacheStore.hasItem(itemId)) {
-    tooltipTimer = setTimeout(() => {
-      tooltip.data = itemCacheStore.getItem(itemId);
-      tooltip.visible = true;
-      adjustTooltipPosition();
-    }, TOOLTIP_DELAY);
+  // Si c'est le même item déjà affiché, juste mettre à jour la position
+  if (tooltip.visible && tooltip.data?.id === itemId) {
+    adjustTooltipPosition();
     return;
   }
 
-  // Sinon, charger avec délai
   tooltipTimer = setTimeout(async () => {
-    try {
-      const items = await itemDetailsService.fetchItemDetails([itemId]);
-      const itemDetails = items[0];
-      if (itemDetails) {
-        itemCacheStore.setItem(itemId, itemDetails);
-        tooltip.data = itemDetails;
+    if (activeTooltipId.value === itemId) {
+      // Vérifier si c'est toujours le même item
+      if (itemCacheStore.hasItem(itemId)) {
+        tooltip.data = itemCacheStore.getItem(itemId);
         tooltip.visible = true;
-        await nextTick(() => {
-          if (tooltipRef.value) {
-            adjustTooltipPosition();
+      } else {
+        try {
+          const items = await itemDetailsService.fetchItemDetails([itemId]);
+          const itemDetails = items[0];
+          if (itemDetails && activeTooltipId.value === itemId) {
+            itemCacheStore.setItem(itemId, itemDetails);
+            tooltip.data = itemDetails;
+            tooltip.visible = true;
           }
-        });
+        } catch (error) {
+          console.error("Erreur chargement item tooltip:", error);
+          tooltip.visible = false;
+        }
       }
-    } catch (error) {
-      console.error("Erreur chargement item tooltip:", error);
-      tooltip.visible = false;
+      await nextTick(() => adjustTooltipPosition());
     }
   }, TOOLTIP_DELAY);
 };
 
+// Modifier la fonction hideTooltip
 const hideTooltip = () => {
   if (tooltipTimer) {
     clearTimeout(tooltipTimer);
-    tooltipTimer = null;
   }
 
-  // Ajouter un délai avant de masquer
   hideTooltipTimer = setTimeout(() => {
     tooltip.visible = false;
     tooltip.data = null;
+    activeTooltipId.value = null;
   }, TOOLTIP_HIDE_DELAY);
 };
 
@@ -229,6 +224,9 @@ const adjustTooltipPosition = () => {
   tooltip.position.x = Math.max(padding, tooltip.position.x);
   tooltip.position.y = Math.max(padding, tooltip.position.y);
 };
+
+let tooltipTimer = null;
+let hideTooltipTimer = null;
 </script>
 
 <style scoped>
