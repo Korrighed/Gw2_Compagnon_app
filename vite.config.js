@@ -3,7 +3,6 @@ import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 
 export default ({ mode }) => {
-  const env = loadEnv(mode, process.cwd());
   const isProd = mode === 'production' || mode === 'gh-pages';
   const baseUrl = isProd ? '/Gw2_Compagnon_app/' : '/';
 
@@ -18,7 +17,6 @@ export default ({ mode }) => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      // Ajout de la configuration pour les assets
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html')

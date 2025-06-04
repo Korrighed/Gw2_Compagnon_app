@@ -14,8 +14,7 @@
         >
       </p>
       <p>
-        Créez une clé avec les autorisations : inventaire, personnages,
-        porte-monnaie.
+        Créez une clé avec les autorisations : inventaire, personnages, compte.
       </p>
       <p>Utilisez cette clé dans l'espace dédié en haut du site.</p>
       <p>
