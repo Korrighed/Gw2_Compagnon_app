@@ -11,6 +11,11 @@ Please refer to the wiki on how to generate said key:
 + https://wiki.guildwars2.com/wiki/API:API_key
 + https://account.arena.net/login?redirect_uri=%2Fapplications
 
+Here is my key if wanna try out the site: 
+```
+E47AFF2D-ED47-EB41-BFF4-3AFBABE443D437883147-C242-46AF-9474-ECDDD62630C7
+```
+
 # The project structure
 This project is bound to evolve with time.      
 As of now, only the inventory of your characters and their names will be displayed.        
