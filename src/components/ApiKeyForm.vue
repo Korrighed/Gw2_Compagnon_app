@@ -25,6 +25,7 @@
         v-model="currentApiKey"
         placeholder="xxxx-xxxx-xxxx-xxx"
         @keyup.enter="handleApiKey"
+        @paste="handlePaste"
       />
       <button
         class="btn btn-outline-secondary glassmorphism text-white ms-md-1 col-md-2 col-7 p-2"
@@ -57,13 +58,28 @@ onMounted(() => {
   apiKeyStore.loadFromLocalStorage();
 });
 
+function handlePaste(event) {
+  event.preventDefault();
+  const pastedText = (event.clipboardData || window.clipboardData).getData(
+    "text"
+  );
+  currentApiKey.value = sanitizeInput(pastedText);
+}
+
+function sanitizeInput(input) {
+  if (!input) return "";
+  // Ne garde que les caractères alphanumériques et tirets
+  return input.replace(/[^A-Z0-9-]/gi, "").slice(0, 72);
+}
+
 function handleApiKey() {
-  if (!currentApiKey.value) {
+  const cleanKey = sanitizeInput(currentApiKey.value);
+  if (!cleanKey) {
     console.error("Clé API invalide !");
     return;
   }
-  apiKeyStore.selectApiKey(currentApiKey.value);
-  emit("apiKeySubmitted", currentApiKey.value);
+  apiKeyStore.selectApiKey(cleanKey);
+  emit("apiKeySubmitted", cleanKey);
   currentApiKey.value = "";
 }
 
