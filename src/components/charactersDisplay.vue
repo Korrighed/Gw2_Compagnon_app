@@ -104,14 +104,12 @@ async function fetchCharacterList() {
     // 1. Chargement rapide de la liste des personnages
     const response = await gw2ApiService.getCharacters();
     characterList.value = Array.isArray(response.data) ? response.data : [];
-
-    // 2. Lancer le chargement des détails en arrière-plan
-    await loadCharacterDetails();
+    isLoading.value = false;
+    loadCharacterDetails();
   } catch (error) {
     console.error("Erreur lors de la récupération des personnages:", error);
     characterList.value = [];
-  } finally {
-    isLoading.value = false; // Fin du chargement
+    isLoading.value = false;
   }
 }
 
