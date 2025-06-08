@@ -24,9 +24,18 @@
   <link href="./src/assets/styles/main.css" rel="stylesheet">
   <link rel="canonical" href="https://korrighed.github.io/Gw2_Compagnon_app">
 
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://api.guildwars2.com; img-src 'self' https://render.guildwars2.com data:; style-src 'self' 'unsafe-inline';">
-  <meta http-equiv="Access-Control-Allow-Origin" content="https://api.guildwars2.com">
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' https://api.guildwars2.com;
+  img-src 'self' https://render.guildwars2.com data:;
+  style-src 'self' 'unsafe-inline';
+  connect-src 'self' https://api.guildwars2.com;
+  form-action 'self';
+  base-uri 'self';
+  frame-ancestors 'none';">
+
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 </head>
 
 
