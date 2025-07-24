@@ -166,7 +166,7 @@ onMounted(() => {
                     :key="discipline"
                     class="crafting-icon"
                     :class="`crafting-${discipline.toLowerCase()}`"
-                    :title="discipline"
+                    :aria-label="discipline"
                   ></span>
                 </div>
               </div>
@@ -201,7 +201,7 @@ onMounted(() => {
                     :key="discipline"
                     class="crafting-icon"
                     :class="`crafting-${discipline.toLowerCase()}`"
-                    :title="discipline"
+                    :aria-label="discipline"
                   ></span>
                 </div>
               </div>
@@ -232,7 +232,7 @@ onMounted(() => {
                     :key="discipline"
                     class="crafting-icon"
                     :class="`crafting-${discipline.toLowerCase()}`"
-                    :title="discipline"
+                    :aria-label="discipline"
                   ></span>
                 </div>
               </a>
