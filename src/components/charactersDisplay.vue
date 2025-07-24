@@ -16,31 +16,16 @@ const characterList = ref([]);
 const isLoading = ref(false);
 const characterDetails = ref(new Map()); // Stocke les détails de chaque personnage
 
-// Utility function for retries
-async function withTimeout(promise, timeout = 12000) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const result = await promise;
-    clearTimeout(timeoutId);
-    return result;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-}
-
 // Récupérer les détails d'un personnage
 async function fetchCharacterDetails(characterName) {
-  const maxRetries = 2;
-  let attempt = 0;
+  const maxFailures = 2;
+  let failures = 0;
 
-  while (attempt < maxRetries) {
+  while (failures < maxFailures) {
     try {
       const [coreResponse, craftingResponse] = await Promise.allSettled([
-        withTimeout(gw2ApiService.getCharacterCore(characterName)),
-        withTimeout(gw2ApiService.getCharacterCrafting(characterName)),
+        gw2ApiService.getCharacterCore(characterName),
+        gw2ApiService.getCharacterCrafting(characterName),
       ]);
 
       // Traitement même si une requête échoue
@@ -63,19 +48,19 @@ async function fetchCharacterDetails(characterName) {
       });
 
       console.log(
-        `Chargement réussi pour ${characterName} (tentative ${attempt + 1})`
+        `Chargement réussi pour ${characterName} (tentative ${failures + 1})`
       );
       return;
     } catch (error) {
-      attempt++;
+      failures++;
       console.warn(
-        `Échec du chargement pour ${characterName} (tentative ${attempt}/${maxRetries})`,
+        `Échec du chargement pour ${characterName} (tentative ${failures}/${maxFailures})`,
         error.message // Ajout du message d'erreur spécifique
       );
 
-      if (attempt === maxRetries) {
+      if (failures === maxFailures) {
         console.error(
-          `Échec définitif pour ${characterName} après ${maxRetries} tentatives`,
+          `Échec définitif pour ${characterName} après ${maxFailures} tentatives`,
           error.message
         );
         characterDetails.value.set(characterName, {
@@ -86,7 +71,7 @@ async function fetchCharacterDetails(characterName) {
       }
 
       // Attendre avant la prochaine tentative
-      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      await new Promise((resolve) => setTimeout(resolve, 1000 * failures));
     }
   }
 }
